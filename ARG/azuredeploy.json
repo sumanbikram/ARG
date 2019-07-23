@@ -70,7 +70,13 @@
     }},
   "variables": {
     "bramha-sqlName": "[concat('bramha-sql', uniqueString(resourceGroup().id))]",
-    "londondreams01Name": "[concat('londondreams01', uniqueString(resourceGroup().id))]"},
+    "londondreams01Name": "[concat('londondreams01', uniqueString(resourceGroup().id))]",
+    "UAT-VnetPrefix": "10.0.0.0/16",
+    "UAT-VnetSubnet1Name": "Subnet-1",
+    "UAT-VnetSubnet1Prefix": "10.0.0.0/24",
+    "UAT-VnetSubnet2Name": "Subnet-2",
+    "UAT-VnetSubnet2Prefix": "10.0.1.0/24",
+    "demoweb001Name": "[concat('demoweb001', uniqueString(resourceGroup().id))]"},
   "resources": [
     {
       "name": "[variables('bramha-sqlName')]",
@@ -137,7 +143,7 @@
       }
     },
     {
-      "name": "[variables('londondreams01Name')]",
+      "name": "[variables('demoweb001Name')]",
       "type": "Microsoft.Web/sites",
       "location": "[resourceGroup().location]",
       "apiVersion": "2015-08-01",
@@ -146,10 +152,10 @@
       ],
       "tags": {
         "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', parameters('myplan-01Name')))]": "Resource",
-        "displayName": "londondreams01"
+        "displayName": "demoweb001"
       },
       "properties": {
-        "name": "[variables('londondreams01Name')]",
+        "name": "[variables('demoweb001Name')]",
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('myplan-01Name'))]"
       }
     }],
