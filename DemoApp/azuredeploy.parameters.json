@@ -4,6 +4,15 @@
   "parameters": {
     "HostingPlanName": {
       "value": "Plan1"
+    },
+    "jdx-sqlAdminLogin": {
+      "value": "hanuman"
+    },
+    "jdx-sqlAdminLoginPassword": {
+      "value": "Hack2pack@2009"
+    },
+    "databaseName": {
+      "value": "crmdb"
     }
   }
 }

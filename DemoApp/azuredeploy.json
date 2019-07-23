@@ -26,9 +26,51 @@
       "metadata": {
         "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
       }
+    },
+    "jdx-sqlAdminLogin": {
+      "type": "string",
+      "minLength": 1
+    },
+    "jdx-sqlAdminLoginPassword": {
+      "type": "securestring"
+    },
+    "databaseName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "databaseCollation": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "SQL_Latin1_General_CP1_CI_AS"
+    },
+    "databaseEdition": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    },
+    "databaseRequestedServiceObjectiveName": {
+      "type": "string",
+      "defaultValue": "Basic",
+      "allowedValues": [
+        "Basic",
+        "S0",
+        "S1",
+        "S2",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes the performance level for Edition"
+      }
     }},
   "variables": {
-    "WebSiteName": "[concat('WebSite', uniqueString(resourceGroup().id))]"},
+    "WebSiteName": "[concat('WebSite', uniqueString(resourceGroup().id))]",
+    "jdx-sqlName": "[concat('jdx-sql', uniqueString(resourceGroup().id))]"},
   "resources": [
     {
       "name": "[parameters('HostingPlanName')]",
@@ -282,6 +324,53 @@
       "properties": {
         "applicationId": "[resourceId('Microsoft.Web/sites', variables('WebSiteName'))]"
       }
+    },
+    {
+      "name": "[variables('jdx-sqlName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2014-04-01-preview",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "jdx-sql"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('jdx-sqlAdminLogin')]",
+        "administratorLoginPassword": "[parameters('jdx-sqlAdminLoginPassword')]"
+      },
+      "resources": [
+        {
+          "name": "AllowAllWindowsAzureIps",
+          "type": "firewallrules",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('jdx-sqlName'))]"
+          ],
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          }
+        },
+        {
+          "name": "[parameters('databaseName')]",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('jdx-sqlName'))]"
+          ],
+          "tags": {
+            "displayName": "database"
+          },
+          "properties": {
+            "collation": "[parameters('databaseCollation')]",
+            "edition": "[parameters('databaseEdition')]",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "[parameters('databaseRequestedServiceObjectiveName')]"
+          }
+        }
+      ]
     }],
   "outputs": {}
 }
